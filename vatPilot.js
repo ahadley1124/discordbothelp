@@ -36,19 +36,16 @@ module.exports = {
             try {
                 conn = await pool.getConnection();
                 // const rows = await conn.query("SELECT 1 as val");
-                var used = toString("SELECT * FROM `vatsim id discord`.`approved`")
-                const response = conn.query("SELECT * FROM `vatsim id discord`.`approved`")
+                const response = await conn.query("SELECT * FROM `vatsim id discord`.`approved`")
                 console.log(response); //[ {val: 1}, meta: ... ]
-                var insert = toString("INSERT INTO approved (Discord, Vatsim) VALUES {message.author, vatCID}")
-                const res = await conn.query(insert)
-                console.log(insert); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
+                const res = await conn.query("INSERT INTO approved (Discord, Vatsim) VALUES (?, ?)", [message.author, vatCID]);
+                console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
             } catch (err) {
                 throw err;
             } finally {
                 if (conn) return conn.end();
             }
         }
-        database_add()
         vatJSON = axios.get(vatURL)
             .then(function (response) {
                 //handle success
@@ -103,11 +100,11 @@ module.exports = {
                     console.log(message.author + " does not have enough Supervisor Hours");
                     mainEmbed.addField("VATSIM Supervisor", "Not enough Hours", true);
                 }
-                
+
                 message.channel.send({ embeds: [mainEmbed] });
 
             })
 
-        
+
     }
 }
